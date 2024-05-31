@@ -5,6 +5,8 @@ from app.models import PropertyVisit
 from datetime import datetime
 from app.database import get_db
 from typing import List
+from app.utils import calculate_distance
+
 router = APIRouter()
 
 @router.post("/", response_model=schemas.PropertyVisit)

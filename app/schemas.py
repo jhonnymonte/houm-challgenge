@@ -25,26 +25,27 @@ class PropertyBase(BaseModel):
     price: float
     description: str
 
-
-class PropertyCreate(BaseModel):
-    address: str
-    location: str
-    price: float
-    description: str
+class PropertyCreate(PropertyBase):
+    pass
 
 class PropertyUpdate(BaseModel):
     address: Optional[str] = None
     location: Optional[str] = None
     price: Optional[float] = None
     description: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
-class Property(PropertyCreate):
+class Property(PropertyBase):
     id: int
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
     class Config:
         from_attributes = True
 
 class PropertyVisitBase(BaseModel):
+    employee_id: int
     property_id: int
     visit_date: datetime
     visitor_name: str
@@ -54,6 +55,8 @@ class PropertyVisitCreate(PropertyVisitBase):
     feedback: Optional[str] = None
 
 class PropertyVisitUpdate(PropertyVisitBase):
+    property_id: Optional[int] = None
+    employee_id: Optional[int] = None
     feedback: Optional[str] = None
 
 class PropertyVisit(PropertyVisitBase):
@@ -63,8 +66,6 @@ class PropertyVisit(PropertyVisitBase):
 
     class Config:
         from_attributes = True
-
-
 
 class EmployeeVisitsReport(BaseModel):
     employee_id: int

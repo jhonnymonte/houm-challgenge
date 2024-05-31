@@ -1,13 +1,23 @@
 from sqlalchemy.orm import Session
 from app.models import Property
 from app.schemas import PropertyUpdate
+from app.utils import get_coordinates
 
 class PropertyRepository:
     def __init__(self, session: Session):
         self.session = session
 
     def create_property(self, address: str, location: str, price: float, description: str):
-        property = Property(address=address, location=location, price=price, description=description)
+        latitude, longitude = get_coordinates(address)
+        
+        property = Property(
+            address=address,
+            location=location,
+            price=price,
+            description=description,
+            latitude=latitude,
+            longitude=longitude
+        )
         self.session.add(property)
         self.session.commit()
         return property
@@ -37,3 +47,4 @@ class PropertyRepository:
             self.session.commit()
             return True
         return False
+

@@ -22,12 +22,13 @@ class Property(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     address = Column(String, index=True)
-    location = Column(String, index=True)
+    location = Column(String)
     price = Column(Float)
     description = Column(String)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
 
     visits = relationship("PropertyVisit", back_populates="property")
-
 
 
 class PropertyVisit(Base):
@@ -43,10 +44,6 @@ class PropertyVisit(Base):
 
     property = relationship("Property", back_populates="visits")
     employee = relationship("Employee")
-
-    employee_id = Column(Integer, ForeignKey('employees.id'))
-    property_id = Column(Integer, ForeignKey('properties.id'))
-
 class Token(BaseModel):
     access_token: str
     token_type: str

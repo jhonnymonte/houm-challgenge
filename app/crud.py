@@ -1,8 +1,10 @@
 from sqlalchemy.orm import Session
+from app.models import PropertyVisit
 from app.repositories.employee import EmployeeRepository
 from app.repositories.property import PropertyRepository
 from app.repositories.property_visit import PropertyVisitRepository
-from app.schemas import EmployeeCreate, EmployeeUpdate, PropertyCreate,PropertyVisitCreate,PropertyVisitUpdate,PropertyUpdate,PropertyVisit
+from app.schemas import EmployeeCreate, EmployeeUpdate, PropertyCreate,PropertyVisitCreate,PropertyVisitUpdate,PropertyUpdate
+from app.utils import get_coordinates
 
 
 
@@ -61,3 +63,14 @@ def delete_property_visit(db: Session, visit_id: int):
 
 def get_visits_by_employee(db: Session, employee_id: int):
     return db.query(PropertyVisit).filter(PropertyVisit.employee_id == employee_id).all()
+
+def create_property_visit(db: Session, employee_id: int, address: str):
+    lat, lng = get_coordinates(address)
+    if lat is None or lng is None:
+        raise ValueError("Invalid address")
+    
+    visit = PropertyVisit(employee_id=employee_id, address=address, lat=lat, lng=lng)
+    db.add(visit)
+    db.commit()
+    db.refresh(visit)
+    return visit

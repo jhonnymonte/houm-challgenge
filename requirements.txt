@@ -8,3 +8,6 @@ python-jose
 pytest
 bcrypt
 passlib
+requests
+opencage
+geopy
