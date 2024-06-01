@@ -19,22 +19,27 @@ class EmployeeRepository:
     def get_employee_by_email(self, email: str):
         return self.session.query(Employee).filter(func.lower(Employee.email) == func.lower(email)).first()
 
-    def update_employee(self, employee_id: int, name: str, email: str):
-        employee = self.get_employee(employee_id)
-        if employee:
-            employee.name = name
-            employee.email = email
-            self.session.commit()
-            return True
-        return False
+    def update_employee(self, employee_id: int, employee: EmployeeUpdate):
+        db_employee = self.session.query(Employee).filter(Employee.id == employee_id).first()
+        if not db_employee:
+            return None
+
+        for var, value in vars(employee).items():
+            if value is not None:  # Update only if value is not None
+                setattr(db_employee, var, value)
+
+        self.session.commit()
+        self.session.refresh(db_employee)
+        return db_employee
 
     def delete_employee(self, employee_id: int):
-        employee = self.get_employee(employee_id)
-        if employee:
-            self.session.delete(employee)
-            self.session.commit()
-            return True
-        return False
+        db_employee = self.session.query(Employee).filter(Employee.id == employee_id).first()
+        if db_employee is None:
+            return None
+        self.session.delete(db_employee)
+        self.session.commit()
+        return db_employee
+
 
 def get_employee_repository(session: Session) -> EmployeeRepository:
     return EmployeeRepository(session)

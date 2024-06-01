@@ -1,7 +1,6 @@
 from opencage.geocoder import OpenCageGeocode
 from geopy.distance import geodesic
 
-# Tu clave API de OpenCage
 key = 'dcde423f47e54054b1c9b36a74b2aa17'
 geocoder = OpenCageGeocode(key)
 
@@ -21,11 +20,5 @@ def calculate_distance(coords1, coords2):
     if coords1 and coords2:
         return geodesic(coords1, coords2).meters
     return None
-
-# # Direcciones
-# address1 = "Pío Nono 450, Recoleta, Región Metropolitana, Chile"
-# address2 = "Plaza de Armas, Santiago, Región Metropolitana, Chile"
-# address3 = "Av. Andrés Bello 2425, Providencia, Región Metropolitana, Chile",
-
 
 

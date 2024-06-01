@@ -1,0 +1,13 @@
+# Archivos de configuración de desarrollo
+.env
+venv/
+# Archivos generados por herramientas
+*.egg-info/
+*.pytest.cache/
+# Archivos de documentación
+docs/build/
+# Archivos temporales
+dist/
+build/
+# Archivos de logs
+*.log

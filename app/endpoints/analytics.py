@@ -24,7 +24,7 @@ def get_visits_by_employee(employee_id: int, db: Session = Depends(get_db)):
         distance = calculate_distance(property_location, next_property_location)
         if distance is not None:
             total_distance += distance
-
+    total_distance = round(total_distance, 2)
     return schemas.EmployeeVisitsReport(employee_id=employee_id, total_visits=total_visits, total_distance=total_distance)
 
 

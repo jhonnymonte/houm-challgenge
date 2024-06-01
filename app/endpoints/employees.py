@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException,status
 from sqlalchemy.orm import Session
 from app import crud, schemas
 from app.database import get_db
 from app.auth import get_current_employee
+from typing import List
 
 router = APIRouter()
 
@@ -19,9 +20,9 @@ def update_employee(employee_id: int, employee: schemas.EmployeeUpdate, db: Sess
         raise HTTPException(status_code=404, detail="Employee not found")
     return db_employee
 
-@router.delete("/{employee_id}", response_model=schemas.Employee)
+@router.delete("/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_employee(employee_id: int, db: Session = Depends(get_db), current_user: schemas.Employee = Depends(get_current_employee)):
-    db_employee = crud.delete_employee(db=db, employee_id=employee_id)
+    db_employee = crud.delete_employee(db, employee_id)
     if db_employee is None:
         raise HTTPException(status_code=404, detail="Employee not found")
-    return db_employee
+    return {"message": f"Employee with ID {employee_id} deleted successfully"}

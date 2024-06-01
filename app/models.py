@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
 from sqlalchemy.orm import relationship
 from .database import Base
 from pydantic import BaseModel
@@ -14,7 +14,6 @@ class Employee(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
 
-    # Relación uno a muchos con PropertyVisit
     visits = relationship("PropertyVisit", back_populates="employee")
 
 class Property(Base):
