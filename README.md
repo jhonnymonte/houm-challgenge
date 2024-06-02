@@ -108,3 +108,5 @@ This project is an API to manage employees, properties and property visits. It i
 ```
 
 ### To Do more easier the testing i create a postman json collection to import and run the test. just import the file in your postman browser
+
+#### to run unnit test use "docker-compose run --rm test"
