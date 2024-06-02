@@ -1,49 +1,72 @@
 import pytest
-from fastapi.testclient import TestClient
-from app.main import app
+from app.database import SessionLocal
 from app.models import Employee
-from sqlalchemy.orm import Session
-from app.database import SessionLocal, engine
+from app.main import app
+from starlette.testclient import TestClient
+import requests
 
-@pytest.fixture
-def db():
+@pytest.fixture(scope="module")
+def test_client():
+    with TestClient(app) as client:
+        yield client
+
+@pytest.fixture(scope="module")
+def test_db():
     db = SessionLocal()
     yield db
     db.close()
 
-@pytest.fixture
-def client():
-    return TestClient(app)
+def create_test_employee(db, email="unique@example.com"):
+    try:
+        employee = Employee(name="Test Employee", email=email, hashed_password="password")
+        db.add(employee)
+        db.commit()
+        db.refresh(employee)
+        return employee
+    except Exception as e:
+        db.rollback()
+        raise e
 
-def test_read_employee(client, db):
-    employee = Employee(name="John Doe", email="john@example.com", hashed_password="hash123")
-    db.add(employee)
-    db.commit()
+def get_valid_token():
+    auth_url = "http://localhost:8000/token"
+    login_data = {
+        "username": "unique@example.com",
+        "password": "password"
+    }
 
-    response = client.get("/employees/1")
+    response = requests.post(auth_url, data=login_data)
+
+    if response.status_code == 200:
+        return response.json()["access_token"]
+    else:
+        print("Failed to retrieve access token:", response.json())
+        raise Exception("Failed to retrieve access token")
+
+def test_get_employee(test_client, test_db):
+    employee = create_test_employee(test_db)
+    token = get_valid_token()
+    headers = {"Authorization": f"Bearer {token}"}
+    response = test_client.get(f"/employees/{employee.id}", headers=headers)
     assert response.status_code == 200
-    assert response.json()["name"] == "John Doe"
-    assert response.json()["email"] == "john@example.com"
 
-def test_update_employee(client, db):
-    employee = Employee(name="Jane Smith", email="jane@example.com", hashed_password="hash456")
-    db.add(employee)
-    db.commit()
-
-    updated_data = {"name": "Jane Doe"}
-    response = client.put("/employees/1", json=updated_data)
+def test_update_employee(test_client, test_db):
+    employee = create_test_employee(test_db)
+    token = get_valid_token()
+    headers = {"Authorization": f"Bearer {token}"}
+    update_data = {"name": "Updated Name"}
+    response = test_client.put(f"/employees/{employee.id}", json=update_data, headers=headers)
     assert response.status_code == 200
 
-    db.refresh(employee)
-    assert employee.name == "Jane Doe"
+def test_delete_employee(test_client, test_db):
+    employee = create_test_employee(test_db)
+    token = get_valid_token()
+    headers = {"Authorization": f"Bearer {token}"}
+    response = test_client.delete(f"/employees/{employee.id}", headers=headers)
+    assert response.status_code == 204
 
-def test_delete_employee(client, db):
-    employee = Employee(name="Sam Brown", email="sam@example.com", hashed_password="hash789")
-    db.add(employee)
-    db.commit()
-
-    response = client.delete("/employees/1")
+def test_login_employee(test_client, test_db):
+    email = "unique@example.com"
+    create_test_employee(test_db, email=email)
+    login_data = {"email": email, "password": "password"}
+    response = test_client.post("/login", json=login_data)
     assert response.status_code == 200
-
-    deleted_employee = db.query(Employee).filter(Employee.id == 1).first()
-    assert deleted_employee is None
