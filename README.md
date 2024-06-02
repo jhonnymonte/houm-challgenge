@@ -77,7 +77,7 @@ This project is an API to manage employees, properties and property visits. It i
 #### Register a Visit
 
 ```http
-  POST/properties/
+  POST/visits/
 ```
 
 | Headers | Type     | Description                |

@@ -11,3 +11,4 @@ passlib
 requests
 opencage
 geopy
+pytest-cov

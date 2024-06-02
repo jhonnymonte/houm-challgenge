@@ -16,17 +16,3 @@ def get_db():
     finally:
         db.close()
 
-
-
-TEST_DATABASE_URL = "sqlite:///:memory:"
-
-TestingEngine = create_engine(TEST_DATABASE_URL)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=TestingEngine)
-Base = declarative_base()
-
-def get_testing_db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()

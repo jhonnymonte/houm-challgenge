@@ -6,7 +6,6 @@ from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 from app import crud
 
-# Creamos una sesión de prueba para la base de datos
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 def override_get_db():
     db = TestingSessionLocal()
@@ -15,13 +14,10 @@ def override_get_db():
     finally:
         db.close()
 
-# Creamos las tablas de la base de datos
 Base.metadata.create_all(bind=engine)
 
-# Creamos una instancia de TestClient
 client = TestClient(app)
 
-# Pruebas unitarias para el enrutador router
 def test_create_property_visit():
     response = client.post(
         "/property-visit/",
@@ -37,7 +33,6 @@ def test_create_property_visit():
     assert response.json()["visitor_name"] == "John Doe"
 
 def test_read_property_visit():
-    # Primero creamos una visita de propiedad para leer
     db = TestingSessionLocal()
     new_visit = crud.create_property_visit(
         db=db,
@@ -49,13 +44,11 @@ def test_read_property_visit():
     )
     db.close()
 
-    # Luego intentamos leer la visita de propiedad recién creada
     response = client.get(f"/property-visit/{new_visit.id}")
     assert response.status_code == 200
     assert response.json()["visitor_name"] == "Jane Smith"
 
 def test_update_property_visit():
-    # Primero creamos una visita de propiedad para actualizar
     db = TestingSessionLocal()
     new_visit = crud.create_property_visit(
         db=db,
@@ -67,7 +60,6 @@ def test_update_property_visit():
     )
     db.close()
 
-    # Luego actualizamos la visita de propiedad recién creada
     response = client.put(
         f"/property-visit/{new_visit.id}",
         json={"visitor_name": "Alice Johnson Updated"}
@@ -76,7 +68,6 @@ def test_update_property_visit():
     assert response.json()["visitor_name"] == "Alice Johnson Updated"
 
 def test_delete_property_visit():
-    # Primero creamos una visita de propiedad para eliminar
     db = TestingSessionLocal()
     new_visit = crud.create_property_visit(
         db=db,
@@ -88,13 +79,11 @@ def test_delete_property_visit():
     )
     db.close()
 
-    # Luego eliminamos la visita de propiedad recién creada
     response = client.delete(f"/property-visit/{new_visit.id}")
     assert response.status_code == 200
     assert response.json()["visitor_name"] == "Bob Williams"
 
 def test_get_visits_by_employee():
-    # Primero creamos algunas visitas de propiedad para el empleado
     db = TestingSessionLocal()
     crud.create_property_visit(
         db=db,
@@ -114,7 +103,6 @@ def test_get_visits_by_employee():
     )
     db.close()
 
-    # Luego intentamos obtener las visitas del empleado
     response = client.get("/property-visit/employee/1")
     assert response.status_code == 200
     assert len(response.json()) == 2

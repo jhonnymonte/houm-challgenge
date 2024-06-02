@@ -1,11 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import crud, schemas,auth
-from app.models import PropertyVisit
-from datetime import datetime
 from app.database import get_db
 from typing import List
-from app.utils import calculate_distance
 
 router = APIRouter()
 
@@ -47,7 +44,7 @@ def delete_property_visit(visit_id: int, db: Session = Depends(get_db)):
 async def get_visits_by_employee(employee_id: int, db: Session = Depends(get_db), token: str = Depends(auth.oauth2_scheme)):
     current_employee = await auth.get_current_employee(db, token)
     if current_employee.id != employee_id:
-        raise HTTPException(status_code=403, detail="Operation not permitted")
+        raise HTTPException(status_code=403, detail="User not found")
     visits = crud.get_visits_by_employee(db, employee_id)
     if not visits:
         raise HTTPException(status_code=404, detail="No visits found for this employee")
